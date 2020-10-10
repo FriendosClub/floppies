@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 def enumerate_images(folder: str, type_filter: [str]) -> [str]:
     images = []
 
-    for subdir, _, files in os.walk('images'):
+    for subdir, _, files in os.walk(folder):
         for filename in files:
             filepath = subdir + os.sep + filename
             _, ext = os.path.splitext(filepath)

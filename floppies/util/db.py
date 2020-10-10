@@ -54,10 +54,10 @@ class Database():
         try:
             return self.__data['version']
         except KeyError as _:
-            logger.warning(
+            logger.warning((
                 'Database exists but does not define a schema version. '
-                + 'Creating it now...'
-            )
+                'Creating it now...'
+            ))
             self.__set_version(G_DB_VERSION)
 
         self.__sync()

@@ -6,19 +6,22 @@ import logging
 
 
 # TODO: Define this some other way than a magic number
-g_db_version = 1
+G_DB_VERSION = 1
 
 logger = logging.getLogger(__name__)
 
 
-class Database(object):
+class Database():
     def __init__(self, filename=None):
+        self.__version = 0
+
         if filename:
             self.import_from_file(filename)
+            self.__sync()
             self.__check_version()
         else:
             self.__data = {}
-            self.__set_version(g_db_version)
+            self.__set_version(G_DB_VERSION)
 
     def __str__(self):
         return json.dumps(self.__data, sort_keys=True, indent=4)
@@ -31,7 +34,7 @@ class Database(object):
         self.__sync()
 
     def __check_version(self) -> bool:
-        if self.get_version() != g_db_version:
+        if self.get_version() != G_DB_VERSION:
             raise Exception('[Database] mismatched database versions.')
 
     def import_from_file(self, filename):
@@ -55,7 +58,7 @@ class Database(object):
                 'Database exists but does not define a schema version. '
                 + 'Creating it now...'
             )
-            self.__set_version(g_db_version)
+            self.__set_version(G_DB_VERSION)
 
         self.__sync()
 

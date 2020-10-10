@@ -1,11 +1,11 @@
-import coloredlogs
 import logging
+import coloredlogs
 from .cloglevel import ClogLevel
 
 logger = logging.getLogger(__name__)
 
 
-class Clogger(object):
+class Clogger():
     # TODO: Make it so ClogLevel.NOTICE shows up as 'NOTICE' instead of
     #       'Level ClogLevel.NOTICE' in logging output
 

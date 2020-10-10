@@ -5,9 +5,10 @@
 #  See the bottom of this file for license information
 #
 
-import colorgram
 import logging
 from os.path import isfile
+
+import colorgram
 from floppies.util import fs
 from floppies.util.args import arguments
 from floppies.util.clogger import Clogger
@@ -38,15 +39,15 @@ if __name__ == '__main__':
     logger.log(ClogLevel.NOTICE, 'processing %s images...', len(images))
 
     # 2. Read database if it exists
-    db = None
+    DB = None
     if isfile(args.db_file):
-        db = Database(args.db_file)
+        DB = Database(args.db_file)
     else:
-        db = Database()
+        DB = Database()
 
     # 3. Loop over list of images, extracting their most common colors
     for image in images:
-        if not db.add(image, {}, force=args.force_update):
+        if not DB.add(image, {}, force=args.force_update):
             continue
 
         logger.debug('Processing %s', image)
@@ -62,9 +63,9 @@ if __name__ == '__main__':
 
                 relavent_colors.append(hex_code)
 
-        db.add(image, {'colors': relavent_colors}, force=True)
+        DB.add(image, {'colors': relavent_colors}, force=True)
 
-    db.export_to_file(args.db_file)
+    DB.export_to_file(args.db_file)
 
 
 #  floppies - generate color pallettes from images in bulk

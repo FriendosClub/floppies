@@ -1,5 +1,7 @@
 # floppies
 
+![Build Status](https://travis-ci.org/FriendosClub/floppies.svg?branch=main)
+
 generate color pallettes from images in bulk
 
 

@@ -2,13 +2,13 @@ language: python
 cache:
   directories:
     - "$HOME/.cache/pip"
+    - "$HOME/.pylint.d"
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
-  - "3.9"
+  - "3.9-dev"
 script:
   # disable docstring warnings for now... will do that Later:tm:
   - pylint --disable=C0114,C0115,C0116 --fail-under=9.0 main.py floppies

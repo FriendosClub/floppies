@@ -6,27 +6,36 @@
 #
 
 import colorgram
+import logging
 from os.path import isfile
 from floppies.util import fs
 from floppies.util.args import arguments
+from floppies.util.clogger import Clogger
+from floppies.util.cloglevel import ClogLevel
 from floppies.util.db import Database
+
+
+logger = logging.getLogger(__name__)
 
 
 if __name__ == '__main__':
     args = arguments().parse_args()
 
-    if len(args.accept_ext) > 2:
+    clogger = Clogger(args.loglevel)
+    clogger.install()
+
+    if len(args.include_ext) > 2:
         # Remove the default value. This is the easiest way I can think of to
         # make action='append' overwrite the default values.
-        args.accept_ext = args.accept_ext[2:]
+        args.include_ext = args.include_ext[2:]
 
     # 1. Get list of image files in images/
-    images = fs.enumerate_images(args.image_dir, args.accept_ext)
+    images = fs.enumerate_images(args.image_dir, args.include_ext)
 
-    if args.max_images > 0:
+    if args.max_images > 0 and args.max_images < len(images):
         images = images[:args.max_images]
 
-    print('[main]', 'got', len(images), 'images')
+    logger.log(ClogLevel.NOTICE, 'processing %s images...', len(images))
 
     # 2. Read database if it exists
     db = None
@@ -37,10 +46,10 @@ if __name__ == '__main__':
 
     # 3. Loop over list of images, extracting their most common colors
     for image in images:
-        if not db.add(image, {}, force=args.force):
+        if not db.add(image, {}, force=args.force_update):
             continue
 
-        print('[main]', 'processing', image)
+        logger.debug('Processing %s', image)
 
         extracted_colors = colorgram.extract(image, args.max_colors)
         relavent_colors = []
@@ -54,9 +63,6 @@ if __name__ == '__main__':
                 relavent_colors.append(hex_code)
 
         db.add(image, {'colors': relavent_colors}, force=True)
-
-    print('[main]', 'updated database:')
-    print(db)
 
     db.export_to_file(args.db_file)
 

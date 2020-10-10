@@ -1,7 +1,11 @@
 #  floppies - generate color pallettes from images in bulk
 #  See the bottom of this file for license information
 
+import logging
 import os
+
+
+logger = logging.getLogger(__name__)
 
 
 def enumerate_images(folder: str, type_filter: [str]) -> [str]:
@@ -15,7 +19,7 @@ def enumerate_images(folder: str, type_filter: [str]) -> [str]:
             if ext in type_filter:
                 images.append(filepath)
             else:
-                print('[util.enumerate_images]', 'Skipped', filepath)
+                logger.debug('Skipped %s', filepath)
 
     return images
 

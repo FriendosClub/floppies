@@ -2,10 +2,13 @@
 #  See the bottom of this file for license information
 
 import json
+import logging
 
 
 # TODO: Define this some other way than a magic number
 g_db_version = 1
+
+logger = logging.getLogger(__name__)
 
 
 class Database(object):
@@ -14,7 +17,7 @@ class Database(object):
             self.import_from_file(filename)
             self.__check_version()
         else:
-            self.data = {}
+            self.__data = {}
             self.__set_version(g_db_version)
 
     def __str__(self):
@@ -48,7 +51,10 @@ class Database(object):
         try:
             return self.__data['version']
         except KeyError as _:
-            print('[Database.get_version]', 'no "version" field in database.')
+            logger.warning(
+                'Database exists but does not define a schema version. '
+                + 'Creating it now...'
+            )
             self.__set_version(g_db_version)
 
         self.__sync()
@@ -58,13 +64,13 @@ class Database(object):
 
     def add(self, image: str, data, *, force=False) -> bool:
         if force:
-            print('[Database.add]', 'force adding', image)
+            logger.debug('Overwriting %s to the database', image)
         elif self.exists(image):
-            print('[Database.add]', 'skipping', image)
+            logger.debug('%s already exists in database, skipping.', image)
             return False
 
         self.__data[image] = data
-        print('[Database.add]', 'added', image)
+        logger.info('Added %s to the database.', image)
         return True
 
     def update(self, filename: str, data):

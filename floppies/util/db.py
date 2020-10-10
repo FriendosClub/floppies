@@ -36,9 +36,11 @@ class Database(object):
             self.__data = json.load(db_file)
         self.__sync()
 
-    def export_to_file(self, filename):
+    def export_to_file(self, filename, *, pretty=False):
+        indent = 4 if pretty else None
+
         with open(filename, 'w') as db_file:
-            json.dump(self.__data, db_file)
+            json.dump(self.__data, db_file, sort_keys=True, indent=indent)
         self.__sync()
 
     def get_version(self) -> int:

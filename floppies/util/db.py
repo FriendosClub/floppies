@@ -4,6 +4,7 @@
 import json
 
 
+# TODO: Define this some other way than a magic number
 g_db_version = 1
 
 

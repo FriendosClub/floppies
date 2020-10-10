@@ -5,52 +5,49 @@
 #  See the bottom of this file for license information
 #
 
-import argparse
 import colorgram
 from os.path import isfile
 from floppies.util import fs
+from floppies.util.args import arguments
 from floppies.util.db import Database
 
 
-debug_max_images = 10  # Set to 0 to disable limiting # of images processed
-debug_force_processing = True
-
-g_files_dbfile = 'database.json'
-g_files_image_folder = 'images'
-g_files_image_exts = ['.jpg', '.png']
-g_processing_num_colors = 10
-g_processing_color_threshold = 0.01
-
-
 if __name__ == '__main__':
-    # 1. Get list of image files in images/
-    images = fs.enumerate_images(g_files_image_folder, g_files_image_exts)
+    args = arguments().parse_args()
 
-    if debug_max_images > 0:
-        images = images[:debug_max_images]
+    if len(args.accept_ext) > 2:
+        # Remove the default value. This is the easiest way I can think of to
+        # make action='append' overwrite the default values.
+        args.accept_ext = args.accept_ext[2:]
+
+    # 1. Get list of image files in images/
+    images = fs.enumerate_images(args.image_dir, args.accept_ext)
+
+    if args.max_images > 0:
+        images = images[:args.max_images]
 
     print('[main]', 'got', len(images), 'images')
 
     # 2. Read database if it exists
     db = None
-    if isfile(g_files_dbfile):
-        db = Database(g_files_dbfile)
+    if isfile(args.db_file):
+        db = Database(args.db_file)
     else:
         db = Database()
 
     # 3. Loop over list of images, extracting their most common colors
     for image in images:
-        if not db.add(image, {}, force=debug_force_processing):
+        if not db.add(image, {}, force=args.force):
             continue
 
         print('[main]', 'processing', image)
 
-        extracted_colors = colorgram.extract(image, g_processing_num_colors)
+        extracted_colors = colorgram.extract(image, args.max_colors)
         relavent_colors = []
 
         # 3.2 Filter nosy hex codes (i.e. those that hardly show up)
         for color in extracted_colors:
-            if color.proportion > g_processing_color_threshold:
+            if color.proportion > args.color_threshold:
                 hex_code = '%02x%02x%02x' % color.rgb
                 hex_code = f'#{hex_code}'
 
@@ -61,7 +58,7 @@ if __name__ == '__main__':
     print('[main]', 'updated database:')
     print(db)
 
-    db.export_to_file(g_files_dbfile)
+    db.export_to_file(args.db_file)
 
 
 #  floppies - generate color pallettes from images in bulk

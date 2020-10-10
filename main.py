@@ -5,9 +5,9 @@
 #  See the bottom of this file for license information
 #
 
+import argparse
 import colorgram
-import json
-import os
+from os.path import isfile
 from floppies.util import fs
 from floppies.util.db import Database
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     # 2. Read database if it exists
     db = None
-    if os.path.isfile(g_files_dbfile):
+    if isfile(g_files_dbfile):
         db = Database(g_files_dbfile)
     else:
         db = Database()
